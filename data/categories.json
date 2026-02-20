@@ -1,0 +1,22 @@
+[
+  { "catname": "Electronics", "description": "Devices, gadgets and accessories" },
+  { "catname": "Fashion", "description": "Clothing, apparel and lifestyle wear" },
+  { "catname": "Home & Kitchen", "description": "Furniture and home essentials" },
+  { "catname": "Books", "description": "Fiction, academic and non-fiction books" },
+  { "catname": "Sports", "description": "Sportswear and fitness equipment" },
+  { "catname": "Beauty", "description": "Skincare and cosmetic products" },
+  { "catname": "Toys", "description": "Kids toys and learning games" },
+  { "catname": "Groceries", "description": "Daily household groceries and supplies" },
+  { "catname": "Automotive", "description": "Vehicle accessories and parts" },
+  { "catname": "Health", "description": "Healthcare and wellness products" },
+  { "catname": "Jewelry", "description": "Fashion and fine jewelry items" },
+  { "catname": "Footwear", "description": "Shoes, sandals and footwear accessories" },
+  { "catname": "Watches", "description": "Analog, digital and smart watches" },
+  { "catname": "Office Supplies", "description": "Stationery and office essentials" },
+  { "catname": "Pet Supplies", "description": "Pet food and accessories" },
+  { "catname": "Gaming", "description": "Gaming consoles and accessories" },
+  { "catname": "Music", "description": "Musical instruments and audio gear" },
+  { "catname": "Garden", "description": "Garden tools and outdoor plants" },
+  { "catname": "Travel", "description": "Travel bags and accessories" },
+  { "catname": "Baby Care", "description": "Products and essentials for babies" }
+]
