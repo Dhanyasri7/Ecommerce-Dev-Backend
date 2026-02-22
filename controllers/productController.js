@@ -1,6 +1,6 @@
 const db = require("../config/db");
 
-
+// ✅ BULK INSERT PRODUCTS
 exports.addProductsBulk = (req, res) => {
   const products = req.body;
 
@@ -35,8 +35,21 @@ exports.addProductsBulk = (req, res) => {
   });
 };
 
+// ✅ DELETE ALL PRODUCTS
+exports.deleteAllProducts = (req, res) => {
+  const sql = "TRUNCATE TABLE products";
 
+  db.query(sql, (err) => {
+    if (err) {
+      console.error("Delete error:", err);
+      return res.status(500).json({ message: "Delete failed" });
+    }
 
+    res.json({ message: "All products deleted successfully" });
+  });
+};
+
+// ✅ GET PRODUCTS BY CATEGORY
 exports.getProductsByCategory = (req, res) => {
   const { catid } = req.params;
 
@@ -56,11 +69,10 @@ exports.getProductsByCategory = (req, res) => {
   });
 };
 
-
-
+// ✅ GET ALL PRODUCTS
 exports.getAllProducts = (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 12; // 12 per page
+  const limit = parseInt(req.query.limit) || 12;
   const offset = (page - 1) * limit;
 
   const countQuery = "SELECT COUNT(*) AS total FROM products";
@@ -88,4 +100,3 @@ exports.getAllProducts = (req, res) => {
     });
   });
 };
-

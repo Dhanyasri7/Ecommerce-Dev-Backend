@@ -8,21 +8,27 @@ async function syncProducts() {
       return;
     }
 
-    for (const product of results) {
-      await client.index({
-        index: "products",
-        id: product.proid,
-        document: {
+    try {
+      const body = results.flatMap((product) => [
+        { index: { _index: "products", _id: product.proid } },
+        {
           proname: product.proname,
           description: product.description,
           price: product.price,
           catid: product.catid,
           image: product.image
-        },
-      });
-    }
+        }
+      ]);
 
-    console.log("All products indexed successfully");
+      await client.bulk({
+        refresh: true,
+        body
+      });
+
+      console.log("All products indexed successfully 🚀");
+    } catch (error) {
+      console.error("Bulk indexing error:", error);
+    }
   });
 }
 
