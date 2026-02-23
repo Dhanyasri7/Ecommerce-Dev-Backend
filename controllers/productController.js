@@ -1,6 +1,6 @@
 const db = require("../config/db");
 
-// ✅ BULK INSERT PRODUCTS
+//  BULK INSERT PRODUCTS
 exports.addProductsBulk = (req, res) => {
   const products = req.body;
 
@@ -35,7 +35,7 @@ exports.addProductsBulk = (req, res) => {
   });
 };
 
-// ✅ DELETE ALL PRODUCTS
+//  DELETE ALL PRODUCTS
 exports.deleteAllProducts = (req, res) => {
   const sql = "TRUNCATE TABLE products";
 
@@ -49,7 +49,7 @@ exports.deleteAllProducts = (req, res) => {
   });
 };
 
-// ✅ GET PRODUCTS BY CATEGORY
+//  GET PRODUCTS BY CATEGORY
 exports.getProductsByCategory = (req, res) => {
   const { catid } = req.params;
 
@@ -69,7 +69,7 @@ exports.getProductsByCategory = (req, res) => {
   });
 };
 
-// ✅ GET ALL PRODUCTS
+//  GET ALL PRODUCTS
 exports.getAllProducts = (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 12;

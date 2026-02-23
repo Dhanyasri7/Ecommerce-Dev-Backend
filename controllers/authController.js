@@ -41,7 +41,7 @@ exports.signup = async (req, res) => {
               return res.status(500).json({ message: "Error creating user" });
             }
 
-            // ✅ Token now includes name
+           
             const token = jwt.sign(
               {
                 email,
@@ -97,7 +97,7 @@ exports.login = (req, res) => {
           return res.status(400).json({ message: "Invalid password" });
         }
 
-        // ✅ Token now includes name
+        //  Token now includes name
         const token = jwt.sign(
           {
             email: user.email,
