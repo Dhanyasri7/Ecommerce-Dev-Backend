@@ -12,8 +12,10 @@ const verifyToken = require("../middleware/authMiddleware");
 
 // Protected routes
 router.post("/", verifyToken, addProductsBulk);
-router.get("/", verifyToken, getAllProducts);
-router.get("/category/:catid", verifyToken, getProductsByCategory);
 router.delete("/delete-all", verifyToken, deleteAllProducts);
+
+// Public routes
+router.get("/", getAllProducts);
+router.get("/category/:catid", getProductsByCategory);
 
 module.exports = router;

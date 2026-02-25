@@ -3,7 +3,7 @@ const router = express.Router();
 const { getCategories, addCategory } = require("../controllers/categoryController");
 const verifyToken = require("../middleware/authMiddleware");
 
-router.get("/", verifyToken, getCategories);
+router.get("/", getCategories);
 router.post("/", verifyToken, addCategory);
 
 module.exports = router;

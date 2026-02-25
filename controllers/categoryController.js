@@ -1,62 +1,72 @@
 const db = require("../config/db");
 
-exports.getCategories = (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 6;
-  const offset = (page - 1) * limit;
+// =======================
+// 🔹 GET CATEGORIES (Paginated)
+// =======================
+exports.getCategories = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const offset = (page - 1) * limit;
 
-  const countQuery = "SELECT COUNT(*) AS total FROM categories";
-  const dataQuery = `
-    SELECT * FROM categories
-    ORDER BY catid ASC
-    LIMIT ? OFFSET ?
-  `;
-
-  db.query(countQuery, (err, countResult) => {
-    if (err) return res.status(500).json({ message: "Database error" });
+    const [countResult] = await db.query(
+      "SELECT COUNT(*) AS total FROM categories"
+    );
 
     const totalCategories = countResult[0].total;
     const totalPages = Math.ceil(totalCategories / limit);
 
-    db.query(dataQuery, [limit, offset], (err, result) => {
-      if (err) return res.status(500).json({ message: "Database error" });
+    const [rows] = await db.query(
+      `
+      SELECT * FROM categories
+      ORDER BY catid ASC
+      LIMIT ? OFFSET ?
+      `,
+      [limit, offset]
+    );
 
-      res.json({
-        currentPage: page,
-        totalPages,
-        totalCategories,
-        categories: result,
-      });
+    res.json({
+      currentPage: page,
+      totalPages,
+      totalCategories,
+      categories: rows,
     });
-  });
+
+  } catch (error) {
+    console.error("Get categories error:", error);
+    res.status(500).json({ message: "Database error" });
+  }
 };
 
 
-exports.addCategory = (req, res) => {
-  const categories = req.body;
+// =======================
+// 🔹 ADD CATEGORY (Bulk)
+// =======================
+exports.addCategory = async (req, res) => {
+  try {
+    const categories = req.body;
 
-  if (!Array.isArray(categories)) {
-    return res.status(400).json({ message: "Send data as array" });
-  }
-
-  const values = categories.map(cat => [
-    cat.catname,
-    cat.description
-  ]);
-
-  db.query(
-    "INSERT INTO categories (catname, description) VALUES ?",
-    [values],
-    (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Database error" });
-      }
-
-      res.status(201).json({
-        message: "Bulk categories inserted",
-        insertedRows: result.affectedRows
-      });
+    if (!Array.isArray(categories)) {
+      return res.status(400).json({ message: "Send data as array" });
     }
-  );
+
+    const values = categories.map(cat => [
+      cat.catname,
+      cat.description
+    ]);
+
+    await db.query(
+      "INSERT INTO categories (catname, description) VALUES ?",
+      [values]
+    );
+
+    res.status(201).json({
+      message: "Bulk categories inserted",
+      insertedRows: values.length
+    });
+
+  } catch (error) {
+    console.error("Add category error:", error);
+    res.status(500).json({ message: "Database error" });
+  }
 };

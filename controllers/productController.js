@@ -1,102 +1,119 @@
 const db = require("../config/db");
 
-//  BULK INSERT PRODUCTS
-exports.addProductsBulk = (req, res) => {
-  const products = req.body;
+// =======================
+// 🔹 BULK INSERT PRODUCTS
+// =======================
+exports.addProductsBulk = async (req, res) => {
+  try {
+    const products = req.body;
 
-  if (!Array.isArray(products)) {
-    return res.status(400).json({ message: "Send data as array" });
-  }
-
-  const values = products.map((p) => [
-    p.proname,
-    p.description,
-    p.price,
-    p.image,
-    p.catid,
-  ]);
-
-  const sql = `
-    INSERT INTO products 
-    (proname, description, price, image, catid)
-    VALUES ?
-  `;
-
-  db.query(sql, [values], (err, result) => {
-    if (err) {
-      console.error("Bulk insert error:", err);
-      return res.status(500).json({ message: "Database error" });
+    if (!Array.isArray(products)) {
+      return res.status(400).json({ message: "Send data as array" });
     }
+
+    const values = products.map((p) => [
+      p.proname,
+      p.description,
+      p.price,
+      p.image,
+      p.catid,
+    ]);
+
+    const sql = `
+      INSERT INTO products 
+      (proname, description, price, image, catid)
+      VALUES ?
+    `;
+
+    const [result] = await db.query(sql, [values]);
 
     res.status(201).json({
       message: "Bulk products inserted successfully",
       insertedRows: result.affectedRows,
     });
-  });
+
+  } catch (error) {
+    console.error("Bulk insert error:", error);
+    res.status(500).json({ message: "Database error" });
+  }
 };
 
-//  DELETE ALL PRODUCTS
-exports.deleteAllProducts = (req, res) => {
-  const sql = "TRUNCATE TABLE products";
 
-  db.query(sql, (err) => {
-    if (err) {
-      console.error("Delete error:", err);
-      return res.status(500).json({ message: "Delete failed" });
-    }
+// =======================
+// 🔹 DELETE ALL PRODUCTS
+// =======================
+exports.deleteAllProducts = async (req, res) => {
+  try {
+    await db.query("TRUNCATE TABLE products");
 
     res.json({ message: "All products deleted successfully" });
-  });
+
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({ message: "Delete failed" });
+  }
 };
 
-//  GET PRODUCTS BY CATEGORY
-exports.getProductsByCategory = (req, res) => {
-  const { catid } = req.params;
 
-  const sql = `
-    SELECT * FROM products
-    WHERE catid = ?
-    ORDER BY proid DESC
-  `;
+// =======================
+// 🔹 GET PRODUCTS BY CATEGORY
+// =======================
+exports.getProductsByCategory = async (req, res) => {
+  try {
+    const { catid } = req.params;
 
-  db.query(sql, [catid], (err, result) => {
-    if (err) {
-      console.error("Fetch by category error:", err);
-      return res.status(500).json({ message: "Database error" });
-    }
+    const [rows] = await db.query(
+      `
+      SELECT * FROM products
+      WHERE catid = ?
+      ORDER BY proid DESC
+      `,
+      [catid]
+    );
 
-    res.json(result);
-  });
+    res.json(rows);
+
+  } catch (error) {
+    console.error("Fetch by category error:", error);
+    res.status(500).json({ message: "Database error" });
+  }
 };
 
-//  GET ALL PRODUCTS
-exports.getAllProducts = (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 12;
-  const offset = (page - 1) * limit;
 
-  const countQuery = "SELECT COUNT(*) AS total FROM products";
-  const dataQuery = `
-    SELECT * FROM products
-    ORDER BY proid DESC
-    LIMIT ? OFFSET ?
-  `;
+// =======================
+// 🔹 GET ALL PRODUCTS (Paginated)
+// =======================
+exports.getAllProducts = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const offset = (page - 1) * limit;
 
-  db.query(countQuery, (err, countResult) => {
-    if (err) return res.status(500).json({ message: "Database error" });
+    const [countResult] = await db.query(
+      "SELECT COUNT(*) AS total FROM products"
+    );
 
     const totalProducts = countResult[0].total;
     const totalPages = Math.ceil(totalProducts / limit);
 
-    db.query(dataQuery, [limit, offset], (err, result) => {
-      if (err) return res.status(500).json({ message: "Database error" });
+    const [rows] = await db.query(
+      `
+      SELECT * FROM products
+      ORDER BY proid DESC
+      LIMIT ? OFFSET ?
+      `,
+      [limit, offset]
+    );
 
-      res.json({
-        currentPage: page,
-        totalPages,
-        totalProducts,
-        products: result,
-      });
+    res.json({
+      currentPage: page,
+      totalPages,
+      totalProducts,
+      products: rows,
     });
-  });
+
+  } catch (error) {
+    console.error("Get products error:", error);
+    res.status(500).json({ message: "Database error" });
+  }
 };
